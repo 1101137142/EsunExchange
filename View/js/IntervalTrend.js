@@ -198,7 +198,7 @@ function getSingleDayExchangeData() {
         var ExchangeTime = new Array();
         var trend = 2;//0降 1升 2初始 升的時候只要增加1基數(BaseNum)或是減少1倍數(base_multiple)才會寫入圖表 反之亦然
         $.each(data, function (k, v) {
-          var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M'];
+          var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M']+ ':' + (v['S'] < 10 ? '0' : '') + v['S'];
           if (now_data == '' || parseFloat(v['rd_sellrate']) >= parseFloat(now_data) + BaseNum || parseFloat(v['rd_sellrate']) <= parseFloat(now_data) - BaseNum) {
             switch (trend) {
               case 0:
@@ -209,7 +209,7 @@ function getSingleDayExchangeData() {
                     trend = 1;
                   }
                   now_data = v['rd_sellrate'];
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend};
+                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend,base:base_multiple};
                   DataKey++;
                 }
                 break;
@@ -222,7 +222,7 @@ function getSingleDayExchangeData() {
                     trend = 0;
                   }
                   now_data = v['rd_sellrate'];
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend};
+                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend,base:base_multiple};
                   DataKey++;
                 }
                 break;
@@ -237,7 +237,7 @@ function getSingleDayExchangeData() {
                   }
                   now_data = v['rd_sellrate'];
 
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend};
+                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend,base:base_multiple};
                   DataKey++;
                 }
                 break;
@@ -249,7 +249,7 @@ function getSingleDayExchangeData() {
              DataKey++;*/
           }
         })
-        //console.log(ExchangeData2);  //ExchangeData2監測走勢參數是否正確
+        console.log(ExchangeData2);  //ExchangeData2監測走勢參數是否正確
         tmp_single.data.labels = ExchangeTime;
         /*tmp_single.data.labels.unshift('08:50');
          tmp_single.data.labels.push('23:10');*/

@@ -2,7 +2,7 @@
 
 class ExchangeModel extends Model {
     function getExchangeDataByDate($currency,$date){
-        $sql = "SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '".$date."%'";
+        $sql = "SELECT DISTINCT * FROM (SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '".$date."%' UNION ALL SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_tmpdetail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '".$date."%') tmp order by rd_datetime ";
         $stmt = $this->cont->prepare($sql);
         $status[] = $stmt->execute(array(':rd_currency'=>$currency));
         $row=$stmt->fetchAll(PDO::FETCH_ASSOC);
