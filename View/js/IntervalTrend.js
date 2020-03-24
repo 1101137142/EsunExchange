@@ -174,6 +174,8 @@ function getSingleDayExchangeData() {
         var now_data = '';
         var BaseNum = 1;
         var MaxFloatNum = 0;
+        var High_price='';
+        var Low_price='';
         for (var i = 0; i < 10; i++) {
           var tmpBaseNum = 1;
           var test_count = 0;
@@ -198,6 +200,12 @@ function getSingleDayExchangeData() {
         var ExchangeTime = new Array();
         var trend = 2;//0降 1升 2初始 升的時候只要增加1基數(BaseNum)或是減少1倍數(base_multiple)才會寫入圖表 反之亦然
         $.each(data, function (k, v) {
+          if(parseFloat(v['rd_sellrate'])>High_price){
+            High_price=parseFloat(v['rd_sellrate']);
+          }
+          if(parseFloat(v['rd_sellrate'])<Low_price){
+            Low_price=parseFloat(v['rd_sellrate']);
+          }
           var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M']+ ':' + (v['S'] < 10 ? '0' : '') + v['S'];
           if (now_data == '' || parseFloat(v['rd_sellrate']) >= parseFloat(now_data) + BaseNum || parseFloat(v['rd_sellrate']) <= parseFloat(now_data) - BaseNum) {
             switch (trend) {

@@ -42,9 +42,9 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="?Content=DayTrend" class="nav-link SideBar_DayTrend">
+              <a href="?Content=TradingRecord" class="nav-link SideBar_TradingRecord">
                 <i class="fas fa-chart-line nav-icon"></i>
-                <p>Day Trend</p>
+                <p>Trading Record</p>
               </a>
             </li>
             <li class="nav-item">
