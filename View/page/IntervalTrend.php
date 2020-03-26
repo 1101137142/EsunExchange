@@ -34,7 +34,8 @@
               <div class="col-lg-9 col-md-7  col-sm-5 col-3">
                 <label id="today_gap"></label>
               </div>
-              <div class="col-lg-3 offset-lg-9 col-md-5 offset-md-7 col-sm-7 offset-sm-5 col-9">
+              <!--div class="col-lg-3 offset-lg-9 col-md-5 offset-md-7 col-sm-7 offset-sm-5 col-9"-->
+              <div class="col-lg-3 col-md-5 col-sm-7 col-9">
                 <div class="col-xs-12 text-right input-group">
                   <select class="form-control f_input" name="currency_single" id="currency_single" data-fname="幣別" >
                     <option value=""></option>
