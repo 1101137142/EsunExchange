@@ -1,10 +1,10 @@
 
-   </div>
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
+</div>
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
 
@@ -39,17 +39,22 @@
 <!-- InputMask -->
 <script src="plugins/moment/moment.min.js"></script>
 <script src="plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="plugins/datatables/jquery.dataTables.js"></script>
+<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.js"></script>
+<!-- Bootstrap slider -->
+<script src="plugins/bootstrap-slider/bootstrap-slider.min.js"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<?php 
-  if(@$_GET["Content"]){
-    $src="View/js/".$_GET["Content"].".js";
-    $Content=$_GET["Content"];
-    echo "<script>$('.SideBar_".$Content."').addClass('active');$('.SideBar_".$Content."').parent().parent().parent().addClass('menu-open');$('.SideBar_".$Content."').parent().parent().parent().children('a').addClass('active');</script>";
-  }else{
-    $src="dist/js/pages/dashboard.js";
-  }
+<?php
+if (@$_GET["Content"]) {
+  $src = "View/js/" . $_GET["Content"] . ".js";
+  $Content = $_GET["Content"];
+  echo "<script>$('.SideBar_" . $Content . "').addClass('active');$('.SideBar_" . $Content . "').parent().parent().parent().addClass('menu-open');$('.SideBar_" . $Content . "').parent().parent().parent().children('a').addClass('active');</script>";
+} else {
+  $src = "dist/js/pages/dashboard.js";
+}
 ?>
 <script src="<?php echo $src; ?>"></script>
 <!-- AdminLTE for demo purposes -->

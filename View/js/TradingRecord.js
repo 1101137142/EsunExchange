@@ -125,6 +125,13 @@ function setTime() {
   var now = new Date();
   now_format = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate()) + " " + (now.getHours() < 10 ? '0' : '') + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
   $('#TradingTime').val(now_format);
+  if($('#TradingType').val()=='1'){
+    console.log($('#TradingType').val());
+    $('#ForeignCurrencyTurnover').val('');
+  }else if($('#TradingType').val()=='0'){
+    console.log($('#TradingType').val());
+    $('#LocalCurrencyTurnover').val('');
+  }
   getRate();
 }
 

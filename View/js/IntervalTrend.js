@@ -3,7 +3,7 @@ var lineChart = {};
 var tmp_single = {};
 var lineChart_single = {};
 $(function () {
-  window.setInterval(getSingleDayExchangeData(), 60);
+  //window.setInterval(getSingleDayExchangeData(), 60);
   var areaChartData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -171,114 +171,122 @@ function getSingleDayExchangeData() {
       success: function (data)
       {
         console.log(data);
-        var now_data = '';
-        var BaseNum = 1;
-        var MaxFloatNum = 0;
-        var High_price = 0;
-        var Low_price = 0;
-        for (var i = 0; i < 10; i++) {
-          var tmpBaseNum = 1;
-          var test_count = 0;
-          var test_val = data[i]['rd_sellrate'];
-          test_val = test_val.split('.');
-          if (test_val[1].length > MaxFloatNum) {
-            MaxFloatNum = test_val[1].length;
-          }
-        }
-        for (var i = 0; i < MaxFloatNum; i++) {
-          BaseNum = BaseNum / 10;
-        }
-        //console.log(BaseNum);
-        var base_multiple = BaseNum;
-        if (parseInt($('#base_multiple').val()) > 1) {
-          base_multiple = BaseNum * $('#base_multiple').val();
-        }
-        //console.log(BaseNum + ',' + base_multiple);
-        var DataKey = 0;
-        var ExchangeData = new Array();
-        var ExchangeData2 = new Array();
-        var ExchangeTime = new Array();
-        var trend = 2;//0降 1升 2初始 升的時候只要增加1基數(BaseNum)或是減少1倍數(base_multiple)才會寫入圖表 反之亦然
-        var last_data = new Array();
-        $.each(data, function (k, v) {
-          if (parseFloat(v['rd_sellrate']) > High_price) {
-            High_price = parseFloat(v['rd_sellrate']);
-          }
-          if (parseFloat(v['rd_sellrate']) < Low_price || Low_price == 0) {
-            Low_price = parseFloat(v['rd_sellrate']);
-          }
-          /*if (v['rd_datetime'].match(/ .*20:15.* /)) {
-           console.log(parseFloat(v['rd_sellrate']));
-           console.log('A:' + parseFloat(v['rd_sellrate']) + ' / B1: ' + parseFloat(now_data) + ' / B:' + (parseFloat(now_data) - BaseNum) + ' / C:' + trend);
-           console.log(parseFloat(v['rd_sellrate']) <= parseFloat(now_data) - BaseNum);
-           }*/
-          var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M'] + ':' + (v['S'] < 10 ? '0' : '') + v['S'];
-          //運算都要加上.toFixed(MaxFloatNum) 避免小數點不精確的問題
-          if (now_data == '' || parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
-            switch (trend) {
-              case 0:
-                if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
-                  ExchangeTime[DataKey] = ShowTime;
-                  ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
-                  if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum)) {
-                    trend = 1;
-                  }
-                  now_data = v['rd_sellrate'];
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
-                  DataKey++;
-                } else {
-                  //console.log('A:' + parseFloat(v['rd_sellrate']) + ' / B:' + parseFloat(now_data) - BaseNum);
-                }
-                break;
-              case 1:
-                if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - base_multiple).toFixed(MaxFloatNum)) {
-                  ExchangeTime[DataKey] = ShowTime;
-                  ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
-
-                  if (parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - base_multiple).toFixed(MaxFloatNum)) {
-                    trend = 0;
-                  }
-                  now_data = v['rd_sellrate'];
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
-                  DataKey++;
-                }
-                break;
-              case 2:
-                if (now_data == '') {
-                  ExchangeTime[DataKey] = ShowTime;
-                  ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
-                  if (now_data > parseFloat(v['rd_sellrate'])) {
-                    trend = 0;
-                  } else if (now_data < parseFloat(v['rd_sellrate'])) {
-                    trend = 1;
-                  }
-                  now_data = v['rd_sellrate'];
-
-                  ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
-                  DataKey++;
-                }
-                break;
+        if (data.length) {
+          var now_data = '';
+          var BaseNum = 1;
+          var MaxFloatNum = 0;
+          var High_price = 0;
+          var Low_price = 0;
+          for (var i = 0; i < 10; i++) {
+            var tmpBaseNum = 1;
+            var test_count = 0;
+            var test_val = data[i]['rd_sellrate'];
+            test_val = test_val.split('.');
+            try {
+              if (test_val[1].length > MaxFloatNum) {
+                MaxFloatNum = test_val[1].length;
+              }
+            } catch (error) {
+              console.log(error);
+              console.log(test_val);
             }
 
-            /*ExchangeTime[DataKey] = ShowTime;
-             ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
-             now_data = v['rd_sellrate'];
-             DataKey++;*/
+
           }
-          last_data = v;
-        })
-        var gap = High_price - Low_price;
-        gap = gap.toFixed(MaxFloatNum);
-        $('#today_gap').html('今日價差：' + gap + '元(' + Low_price + '/' + High_price + ') | 最後報價：' + last_data['rd_sellrate'] + '(' + (last_data['rd_sellrate'] - Low_price).toFixed(MaxFloatNum) + '/' + (High_price - last_data['rd_sellrate']).toFixed(MaxFloatNum) + ') [' + last_data['rd_datetime'] + ']');
-        /*console.log(High_price);
-         console.log(Low_price);*/
-        console.log()
-        console.log(ExchangeData2);  //ExchangeData2監測走勢參數是否正確
-        tmp_single.data.labels = ExchangeTime;
-        /*tmp_single.data.labels.unshift('08:50');
-         tmp_single.data.labels.push('23:10');*/
-        tmp_single.data.datasets[0].data = ExchangeData;
-        window.lineChart_single.update();
+          for (var i = 0; i < MaxFloatNum; i++) {
+            BaseNum = BaseNum / 10;
+          }
+          //console.log(BaseNum);
+          var base_multiple = BaseNum;
+          if (parseInt($('#base_multiple').val()) > 1) {
+            base_multiple = BaseNum * $('#base_multiple').val();
+          }
+          //console.log(BaseNum + ',' + base_multiple);
+          var DataKey = 0;
+          var ExchangeData = new Array();
+          var ExchangeData2 = new Array();
+          var ExchangeTime = new Array();
+          var trend = 2;//0降 1升 2初始 升的時候只要增加1基數(BaseNum)或是減少1倍數(base_multiple)才會寫入圖表 反之亦然
+          var last_data = new Array();
+          $.each(data, function (k, v) {
+            if (parseFloat(v['rd_sellrate']) > High_price) {
+              High_price = parseFloat(v['rd_sellrate']);
+            }
+            if (parseFloat(v['rd_sellrate']) < Low_price || Low_price == 0) {
+              Low_price = parseFloat(v['rd_sellrate']);
+            }
+            /*if (v['rd_datetime'].match(/ .*20:15.* /)) {
+             console.log(parseFloat(v['rd_sellrate']));
+             console.log('A:' + parseFloat(v['rd_sellrate']) + ' / B1: ' + parseFloat(now_data) + ' / B:' + (parseFloat(now_data) - BaseNum) + ' / C:' + trend);
+             console.log(parseFloat(v['rd_sellrate']) <= parseFloat(now_data) - BaseNum);
+             }*/
+            var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M'] + ':' + (v['S'] < 10 ? '0' : '') + v['S'];
+            //運算都要加上.toFixed(MaxFloatNum) 避免小數點不精確的問題
+            if (now_data == '' || parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
+              switch (trend) {
+                case 0:
+                  if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
+                    ExchangeTime[DataKey] = ShowTime;
+                    ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
+                    if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum)) {
+                      trend = 1;
+                    }
+                    now_data = v['rd_sellrate'];
+                    ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
+                    DataKey++;
+                  } else {
+                    //console.log('A:' + parseFloat(v['rd_sellrate']) + ' / B:' + parseFloat(now_data) - BaseNum);
+                  }
+                  break;
+                case 1:
+                  if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - base_multiple).toFixed(MaxFloatNum)) {
+                    ExchangeTime[DataKey] = ShowTime;
+                    ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
+
+                    if (parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - base_multiple).toFixed(MaxFloatNum)) {
+                      trend = 0;
+                    }
+                    now_data = v['rd_sellrate'];
+                    ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
+                    DataKey++;
+                  }
+                  break;
+                case 2:
+                  if (now_data == '') {
+                    ExchangeTime[DataKey] = ShowTime;
+                    ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
+                    if (now_data > parseFloat(v['rd_sellrate'])) {
+                      trend = 0;
+                    } else if (now_data < parseFloat(v['rd_sellrate'])) {
+                      trend = 1;
+                    }
+                    now_data = v['rd_sellrate'];
+
+                    ExchangeData2[DataKey] = {x: ShowTime, y: v['rd_sellrate'], z: trend, base: base_multiple};
+                    DataKey++;
+                  }
+                  break;
+              }
+
+              /*ExchangeTime[DataKey] = ShowTime;
+               ExchangeData[DataKey] = {x: ShowTime, y: v['rd_sellrate']};
+               now_data = v['rd_sellrate'];
+               DataKey++;*/
+            }
+            last_data = v;
+          })
+          var gap = High_price - Low_price;
+          gap = gap.toFixed(MaxFloatNum);
+          $('#today_gap').html('今日價差：' + gap + '元(' + Low_price + '/' + High_price + ') | 最後報價：' + last_data['rd_sellrate'] + '(' + (last_data['rd_sellrate'] - Low_price).toFixed(MaxFloatNum) + '/' + (High_price - last_data['rd_sellrate']).toFixed(MaxFloatNum) + ') [' + last_data['rd_datetime'] + ']');
+          /*console.log(High_price);
+           console.log(Low_price);*/
+          console.log(ExchangeData2);  //ExchangeData2監測走勢參數是否正確
+          tmp_single.data.labels = ExchangeTime;
+          /*tmp_single.data.labels.unshift('08:50');
+           tmp_single.data.labels.push('23:10');*/
+          tmp_single.data.datasets[0].data = ExchangeData;
+          window.lineChart_single.update();
+        }
       },
       error: function (data) {
         console.log('An error occurred.');
@@ -296,11 +304,17 @@ $(".content").on("change", '#date_range', function (event) {
 $(".content").on("change", '#currency_single', function (event) {
   getSingleDayExchangeData();
 });
+var timer = 0;
 $(".content").on("change", '#date_single', function (event) {
+  var now = new Date();
+  var todate = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
+  if (todate == $(this).val()) {
+    timer = setInterval(getSingleDayExchangeData, 6000);
+  } else {
+    clearInterval(timer);
+  }
   getSingleDayExchangeData();
 });
 $(".content").on("change", '#base_multiple', function (event) {
-
   getSingleDayExchangeData();
 });
-setInterval(getSingleDayExchangeData, 60000);
