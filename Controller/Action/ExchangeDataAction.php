@@ -8,8 +8,8 @@ class ExchangeDataAction implements actionPerformed {
 
     $doExchangeAction = $_POST["doExchangeAction"];
     
-    $currency = $_POST["currency"];
-    $date = $_POST["date"];
+    @$currency = $_POST["currency"];
+    @$date = $_POST["date"];
     switch ($doExchangeAction) {
       /*case 'buyExchange':
         //$returnData = $ShopModel->buyExchange($ExchangeID);
@@ -26,6 +26,10 @@ class ExchangeDataAction implements actionPerformed {
       case 'doCreateExchange':
         //$returnData = $ShopModel->doCreateExchange($event->getPost());
         break;*/
+      case 'getExchangeCurrency':
+        $returnData = $ExchangeModel->getExchangeCurrency();
+        //$returnData=[$currency,$date];
+        break;
       case 'getExchangeDataByDay':
         $returnData = $ExchangeModel->getExchangeDataByDate($currency,$date);
         //$returnData=[$currency,$date];

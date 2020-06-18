@@ -3,7 +3,7 @@
 class ExchangeModel extends Model {
 
   function getExchangeDataByDate($currency, $date) {
-    $sql = "SELECT DISTINCT * FROM (SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%' UNION ALL SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_tmpdetail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%') tmp order by rd_datetime ";
+    $sql = "SELECT DISTINCT * FROM (SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%' UNION ALL SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_tmpdetail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%') tmp left join currencydata on tmp.rd_currency=currencydata.CurrencyCode order by rd_datetime ";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute(array(':rd_currency' => $currency));
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -19,14 +19,21 @@ class ExchangeModel extends Model {
   }
 
   function getExchangeCurrency() {
-    $sql = "SELECT DISTINCT rhl_currency FROM `rates_hl` ";
+    $sql = "SELECT DISTINCT rhl_currency,CurrencyName FROM `rates_hl` left join currencydata on rhl_currency=CurrencyCode ";
+    $stmt = $this->cont->prepare($sql);
+    $status[] = $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $row;
+  }
+  function getTradingRecordCurrency() {
+    $sql = "SELECT DISTINCT tr_currency,CurrencyName FROM `trading_record` left join currencydata on tr_currency=CurrencyCode ";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $row;
   }
 
-  function getExchangeCurrencyNowRate($TradingCurrency, $TradingTime='') {
+  function getExchangeCurrencyNowRate($TradingCurrency, $TradingTime = '') {
     $date = new DateTime($TradingTime);
     $curl = curl_init();
     curl_setopt_array($curl, array(
@@ -66,24 +73,24 @@ class ExchangeModel extends Model {
     $BBoardRate = null;
     $SBoardRate = null;
     foreach ($Rate_array as $key => $val) {
-      /*if ($val["Key"] == $TradingCurrency) {
+      /* if ($val["Key"] == $TradingCurrency) {
         $BBoardRate = $val['BBoardRate'];
         $SBoardRate = $val['SBoardRate'];
-      }*/
-        
-        $BoardRate[$val["Key"]]['BBoardRate'] = $val['BuyIncreaseRate'];
-        $BoardRate[$val["Key"]]['SBoardRate'] = $val['SellDecreaseRate'];
-        //$SBoardRate[$val["Key"]] = $val['SBoardRate'];
+        } */
+
+      $BoardRate[$val["Key"]]['BBoardRate'] = $val['BuyIncreaseRate'];
+      $BoardRate[$val["Key"]]['SBoardRate'] = $val['SellDecreaseRate'];
+      //$SBoardRate[$val["Key"]] = $val['SBoardRate'];
     }
     $row = array('TradingTime' => $date->format('Y-m-d H:i:s'), 'BoardRate' => $BoardRate);
     return $row;
   }
 
-  function insExchangeTradingRecord($TradingType, $TradingCurrency, $TradingRate, $LocalCurrencyTurnover, $ForeignCurrencyTurnover) {
+  function insExchangeTradingRecord($TradingType, $TradingTime, $TradingCurrency, $TradingRate, $LocalCurrencyTurnover, $ForeignCurrencyTurnover) {
     $sql = "INSERT INTO `trading_record`( `tr_type`, `tr_tradingtime`, `tr_currency`, `tr_rate`, `tr_LocalCurrencyTurnover`, `tr_ForeignCurrencyTurnover`)  ";
-    $sql .= "VALUES (:TradingType,now(),:TradingCurrency,:TradingRate,:LocalCurrencyTurnover,:ForeignCurrencyTurnover)";
+    $sql .= "VALUES (:TradingType,:TradingTime,:TradingCurrency,:TradingRate,:LocalCurrencyTurnover,:ForeignCurrencyTurnover)";
     $stmt = $this->cont->prepare($sql);
-    $status[] = $stmt->execute(array(':TradingType' => $TradingType, ':TradingCurrency' => $TradingCurrency, ':TradingRate' => $TradingRate, ':LocalCurrencyTurnover' => $LocalCurrencyTurnover, ':ForeignCurrencyTurnover' => $ForeignCurrencyTurnover));
+    $status[] = $stmt->execute(array(':TradingType' => $TradingType,':TradingTime'=>$TradingTime, ':TradingCurrency' => $TradingCurrency, ':TradingRate' => $TradingRate, ':LocalCurrencyTurnover' => $LocalCurrencyTurnover, ':ForeignCurrencyTurnover' => $ForeignCurrencyTurnover));
     //$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $status;
   }

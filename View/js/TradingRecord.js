@@ -19,15 +19,36 @@ $(function () {
     type: "POST",
     url: url,
     dataType: "json",
-    data: {doExchangeAction: 'getExchangeCurrency'}, // serializes the form's elements.
+    data: {doTradingRecordAction: 'getExchangeCurrency'}, // serializes the form's elements.
     success: function (data)
     {
       //console.log(data);
       var opt = '<option value=""></option>';
       $.each(data, function (k, v) {
-        opt += "<option value='" + v['rhl_currency'] + "'>" + v['rhl_currency'] + "</option>";
+        opt += "<option value='" + v['rhl_currency'] + "'>" + v['CurrencyName'] + "</option>";
       });
       $('#TradingCurrency').html(opt);
+      getRate();
+      //console.log(opt);
+    },
+    error: function (data) {
+      console.log('An error occurred.');
+      console.log(data);
+    }
+  });
+  $.ajax({
+    type: "POST",
+    url: url,
+    dataType: "json",
+    data: {doTradingRecordAction: 'getTradingRecordCurrency'}, // serializes the form's elements.
+    success: function (data)
+    {
+      //console.log(data);
+      var opt = '<option value=""></option>';
+      $.each(data, function (k, v) {
+        opt += "<option value='" + v['tr_currency'] + "'>" + v['CurrencyName'] + "</option>";
+      });
+      $('#schRecordCurrency').html(opt);
       getRate();
       //console.log(opt);
     },
@@ -55,12 +76,13 @@ function saveform() {
     ins_val[$(this).attr('id')] = $(this).val();
   })
   //console.log(ins_val);
+  //return false;
   var url = "index.php?action=TradingRecordAction";
   $.ajax({
     type: "POST",
     url: url,
     dataType: "json",
-    data: {data: ins_val, doExchangeAction: 'insExchangeTradingRecord'}, // serializes the form's elements.
+    data: {data: ins_val, doTradingRecordAction: 'insExchangeTradingRecord'}, // serializes the form's elements.
     success: function (data)
     {
       //console.log(data);
@@ -89,7 +111,7 @@ function getRate() {
     type: "POST",
     url: url,
     dataType: "json",
-    data: {data: ins_val, doExchangeAction: 'getExchangeCurrencyNowRate'}, // serializes the form's elements.
+    data: {data: ins_val, doTradingRecordAction: 'getExchangeCurrencyNowRate'}, // serializes the form's elements.
     success: function (data)
     {
       console.log(data);
@@ -104,6 +126,50 @@ function getRate() {
        if ($('#TradingType').val() != '') {
        $('#TradingType').change();
        }*/
+    },
+    error: function (data) {
+      console.log(ins_val);
+      console.log('An error occurred.');
+      console.log(data);
+    }
+  });
+}
+
+function getRecord() {
+  var sch_val = new Object();
+  var date=new Object();
+  if($('#date_range').val().replace(/\s/g, '')!=''){
+     date= $('#date_range').val().replace(/\s/g, '').split('~');
+  }
+  sch_val['TradingCurrency'] = $('#TradingCurrency').val();
+  //console.log(ins_val);
+  var url = "index.php?action=TradingRecordAction";
+  $.ajax({
+    type: "POST",
+    url: url,
+    dataType: "json",
+    data: {data: sch_val, doTradingRecordAction: 'getExchangeTradingRecord'}, // serializes the form's elements.
+    success: function (data)
+    {
+      console.log(data);
+      var count_data=0;
+      var trading_table_body_html='';
+      $.each(data['BoardRate'], function (k, v) {
+        if(count_data%2==0){
+          trading_table_body_html+='<tr role="row" class="odd">';          
+        }else{
+          trading_table_body_html+='<tr role="row" class="even">';          
+        }
+        trading_table_body_html+='<td>'+v['tr_type']+'</td>';//買賣類別
+        trading_table_body_html+='<td>'+v['tr_currency']+'</td>';//幣別
+        trading_table_body_html+='<td>'+v['tr_LocalCurrencyTurnover']+'</td>';//本幣金額
+        trading_table_body_html+='<td>'+v['tr_ForeignCurrencyTurnover']+'</td>';//外幣金額
+        trading_table_body_html+='<td>'+v['tr_rate']+'</td>';//交易匯率
+        count_data++;
+      })
+      $('#trading_table_body').html(trading_table_body_html);
+      
+      
     },
     error: function (data) {
       console.log(ins_val);
@@ -145,7 +211,7 @@ $('form').on('change', '#TradingTime', function () {
 
 $('#TradingCurrency').change(function () {
   if ($(this).val() != '') {
-    if ($('#TradingTime').val() != '') {
+    if ($('#TradingTime').val() != '') {  //設定該幣別的買價與賣價
       $('#TradingType option[value=0]').data('Rate', $('#TradingCurrency option[value=' + $('#TradingCurrency').val() + ']').data('BRate'));
       $('#TradingType option[value=1]').data('Rate', $('#TradingCurrency option[value=' + $('#TradingCurrency').val() + ']').data('SRate'));
     }
@@ -176,9 +242,13 @@ $('form').on('change', '#LocalCurrencyTurnover', function () {
 })
 $('form').on('change', '#ForeignCurrencyTurnover', function () {
   //console.log($(this).val());
-  if ($('#TradingRate').val() != '' && ($('#LocalCurrencyTurnover').val() == '' || parseFloat($('#ForeignCurrencyTurnover').val() == 0))) {
+  if ($('#TradingRate').val() != '' && ($('#LocalCurrencyTurnover').val() == '' || parseFloat($('#LocalCurrencyTurnover').val() == 0))) {
     $('#LocalCurrencyTurnover').val(Math.round($('#ForeignCurrencyTurnover').val() * $('#TradingRate').val() * 100) / 100);
   }
+})
+
+$('.schRecordForm').change(function(){
+  
 })
 /*$('#LocalCurrencyTurnover').change(function(){
  console.log($(this).val());

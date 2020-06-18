@@ -36,20 +36,32 @@
               </div>
               <!--div class="col-lg-3 offset-lg-9 col-md-5 offset-md-7 col-sm-7 offset-sm-5 col-9"-->
               <div class="col-lg-3 col-md-5 col-sm-7 col-9">
-                <div class="col-xs-12 text-right input-group">
-                  <select class="form-control f_input" name="currency_single" id="currency_single" data-fname="幣別" >
+                <div class="col-xs-12 text-right input-group  justify-content-end">
+                  <input type="text" class="form-control f_input" name="cost_of_buying_rate"  id="cost_of_buying_rate" placeholder="買幣成本" data-fname="買幣成本">
+                  <input type="text" class="form-control f_input" name="cost_of_buying_price"  id="cost_of_buying_price" placeholder="買幣金額" data-fname="買幣金額">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-7 col-md-6  col-sm-5 col-3">
+                <label id="today_gap2"></label>
+              </div>
+              <!--div class="col-lg-3 offset-lg-9 col-md-5 offset-md-7 col-sm-7 offset-sm-5 col-9"-->
+              <div class="col-lg-5 col-md-6 col-sm-7 col-9">
+                <div class="col-xs-12 text-right input-group justify-content-end" >
+                  <select class="form-control f_input currency_class" name="currency_single" id="currency_single" data-fname="幣別" >
                     <option value=""></option>
                     <option value="AUD" selected>澳幣</option>
                     <option value="USD">美金</option>
                     <option value="CNY">人民幣</option>
                   </select>
                   <input type="text" class="form-control f_input" name="date_single"  id="date_single" placeholder="日期" data-fname="日期" >
-                  <input type="text" class="form-control f_input" name="base_multiple"  id="base_multiple" placeholder="波動基數" data-fname="波動基數" >
+                  <input type="text" class="form-control f_input pull-right" name="base_multiple"  id="base_multiple" placeholder="波動基數" data-fname="波動基數" >
                 </div>
               </div>
             </div>
             <div class="chart">
-              <canvas id="lineChart_single" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+              <canvas id="lineChart_single"></canvas>
             </div>
           </div>
           <!-- /.card-body -->
@@ -78,7 +90,7 @@
                     <option value="4">過去三十天</option>
                     <option value="5" style="display: none;">自訂區間</option>
                   </select-->
-                  <select class="form-control f_input" name="currency" id="currency" data-fname="幣別" >
+                  <select class="form-control f_input currency_class" name="currency" id="currency" data-fname="幣別" >
                     <option value=""></option>
                     <option value="AUD" selected>澳幣</option>
                     <option value="USD">美金</option>
@@ -94,7 +106,7 @@
               </div>
             </div>
             <div class="chart">
-              <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+              <canvas id="lineChart"></canvas>
             </div>
           </div>
           <!-- /.card-body -->
