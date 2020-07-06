@@ -84,10 +84,11 @@ $(function () {
 
   var now = new Date();
   var todate = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
-  now.setDate(now.getDate() - 7);
-  var sevendayago = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
+  now.setDate(now.getDate() - 90);
+  //var sevendayago = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
+  var NintyDayAgo = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
   $('#date_range').daterangepicker({
-    "startDate": sevendayago,
+    "startDate": NintyDayAgo,
     "endDate": todate,
     "autoApply": true,
     locale: {
@@ -105,7 +106,7 @@ $(function () {
     }}, function (start, end, label) {
     //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
   });
-  
+
   //取得貨幣資料
   var url = "index.php?action=ExchangeDataAction";
   $.ajax({
@@ -118,12 +119,12 @@ $(function () {
       //console.log(data);
       var opt = '<option value=""></option>';
       $.each(data, function (k, v) {
-        opt += "<option value='" + v['rhl_currency']+ "' " ;
-        if(v['rhl_currency']=='AUD'){
-          opt +=" selected ";
+        opt += "<option value='" + v['rhl_currency'] + "' ";
+        if (v['rhl_currency'] == 'AUD') {
+          opt += " selected ";
         }
-         opt+= "'>" + v['CurrencyName'] + "</option>";
-        
+        opt += "'>" + v['CurrencyName'] + "</option>";
+
       });
       $('.currency_class').html(opt);
       console.log(opt);
@@ -236,10 +237,11 @@ function getSingleDayExchangeData() {
           var ExchangeTime = new Array();
           var trend = 2;//0降 1升 2初始 升的時候只要增加1基數(BaseNum)或是減少1倍數(base_multiple)才會寫入圖表 反之亦然
           var last_data = new Array();
-          var BidAsk_spread=data[0]['BidAsk_spread'];//買賣價差
-          var OnlineBankDiscount=data[0]['OnlineBankDiscount'];//網銀優惠
-          
+          var BidAsk_spread = data[0]['BidAsk_spread'];//買賣價差
+          var OnlineBankDiscount = data[0]['OnlineBankDiscount'];//網銀優惠
+
           $.each(data, function (k, v) {
+            
             if (parseFloat(v['rd_sellrate']) > High_price) {
               High_price = parseFloat(v['rd_sellrate']);
             }
@@ -253,7 +255,9 @@ function getSingleDayExchangeData() {
              }*/
             var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M'] + ':' + (v['S'] < 10 ? '0' : '') + v['S'];
             //運算都要加上.toFixed(MaxFloatNum) 避免小數點不精確的問題
+            
             if (now_data == '' || parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
+              
               switch (trend) {
                 case 0:
                   if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
@@ -308,30 +312,30 @@ function getSingleDayExchangeData() {
           })
           var gap = High_price - Low_price;
           gap = gap.toFixed(MaxFloatNum);
-          var OperatingReportingRate=0;//今日最高投報率
-          OperatingReportingRate=Math.round((((High_price-BidAsk_spread+parseFloat(OnlineBankDiscount))-(Low_price-OnlineBankDiscount))/(Low_price-OnlineBankDiscount))*10000)/100;//(賣價[最高價]-買價[最低價])/買價[最低價]=投報率 最後除以10000求整數 回乘100取回正確的小數點
-          var NowOperatingReportingRate=0;//現值投報率
-          if($('#cost_of_buying_rate').val()==''){
+          var OperatingReportingRate = 0;//今日最高投報率
+          OperatingReportingRate = Math.round((((High_price - BidAsk_spread + parseFloat(OnlineBankDiscount)) - (Low_price - OnlineBankDiscount)) / (Low_price - OnlineBankDiscount)) * 10000) / 100;//(賣價[最高價]-買價[最低價])/買價[最低價]=投報率 最後除以10000求整數 回乘100取回正確的小數點
+          var NowOperatingReportingRate = 0;//現值投報率
+          if ($('#cost_of_buying_rate').val() == '') {
             console.log('cost_of_buying is empty');
             //NowOperatingReportingRate=Math.round((((last_data['rd_sellrate']-BidAsk_spread+parseFloat(OnlineBankDiscount))-(Low_price-OnlineBankDiscount))/(Low_price-OnlineBankDiscount))*10000)/100;//(賣價[最後報價]-買價[最低價])/買價[最低價]=投報率
-            NowOperatingReportingRate='-';//(賣價-買價)/買價=投報率 最後除以10000求整數 回乘100取回正確的小數點
-          }else{
+            NowOperatingReportingRate = '-';//(賣價-買價)/買價=投報率 最後除以10000求整數 回乘100取回正確的小數點
+          } else {
             console.log('cost_of_buying is not empty');
-            NowOperatingReportingRate=Math.round((((last_data['rd_sellrate']-BidAsk_spread+parseFloat(OnlineBankDiscount))-($('#cost_of_buying_rate').val()-OnlineBankDiscount))/($('#cost_of_buying_rate').val()-OnlineBankDiscount))*10000)/100;//(賣價[最後報價]-買價[實際成本])/買價[實際成本]=投報率
+            NowOperatingReportingRate = Math.round((((last_data['rd_sellrate'] - BidAsk_spread + parseFloat(OnlineBankDiscount)) - ($('#cost_of_buying_rate').val() - OnlineBankDiscount)) / ($('#cost_of_buying_rate').val() - OnlineBankDiscount)) * 10000) / 100;//(賣價[最後報價]-買價[實際成本])/買價[實際成本]=投報率
           }
-          
-          console.log((High_price-BidAsk_spread+parseFloat(OnlineBankDiscount)));
+
+          console.log((High_price - BidAsk_spread + parseFloat(OnlineBankDiscount)));
           $('#today_gap').html('今日價差：' + gap + '元(' + Low_price + '/' + High_price + ') | 最後報價：' + last_data['rd_sellrate'] + '(' + (last_data['rd_sellrate'] - Low_price).toFixed(MaxFloatNum) + '/' + (High_price - last_data['rd_sellrate']).toFixed(MaxFloatNum) + ') [' + last_data['rd_datetime'] + '] ');
-          var NowProfit=0;
-          var today_gap2_html='';
-          if($('#cost_of_buying_price').val()!=''){
-            NowProfit=Math.round($('#cost_of_buying_price').val()*NowOperatingReportingRate*100)/10000;
-            today_gap2_html='今日投報率：'+OperatingReportingRate+'% | 現值投報率：'+NowOperatingReportingRate+'% | 目前損益：'+NowProfit;
-          }else{
-            today_gap2_html='今日投報率：'+OperatingReportingRate+'% | 現值投報率：'+NowOperatingReportingRate+'% ';
+          var NowProfit = 0;
+          var today_gap2_html = '';
+          if ($('#cost_of_buying_price').val() != '') {
+            NowProfit = Math.round($('#cost_of_buying_price').val() * NowOperatingReportingRate * 100) / 10000;
+            today_gap2_html = '今日投報率：' + OperatingReportingRate + '% | 現值投報率：' + NowOperatingReportingRate + '% | 目前損益：' + NowProfit;
+          } else {
+            today_gap2_html = '今日投報率：' + OperatingReportingRate + '% | 現值投報率：' + NowOperatingReportingRate + '% ';
           }
           $('#today_gap2').html(today_gap2_html);
-          
+
           /*console.log(High_price);
            console.log(Low_price);*/
           console.log(ExchangeData2);  //ExchangeData2監測走勢參數是否正確
@@ -352,7 +356,7 @@ function getSingleDayExchangeData() {
 
 function refresh()
 {
-window.location.reload();
+  window.location.reload();
 }
 $(".content").on("change", '#currency', function (event) {
   getRangeExchangeData();
@@ -377,11 +381,11 @@ $(".content").on("change", '#date_single', function (event) {
   var nowhour = now.getHours();
   var nowday = now.getDay();
   if (todate == $(this).val()) {
-	if(nowhour >=9 && nowhour <23 && nowday>=1 && nowday<=5) {
-		timer = setInterval(getSingleDayExchangeData, 4000);
-	}else{
-		timer = setInterval(refresh, 600000);		
-	}
+    if (nowhour >= 9 && nowhour < 23 && nowday >= 1 && nowday <= 5) {
+      timer = setInterval(getSingleDayExchangeData, 4000);
+    } else {
+      timer = setInterval(refresh, 600000);
+    }
   } else {
     clearInterval(timer);
   }

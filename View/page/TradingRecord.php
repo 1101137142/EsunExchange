@@ -112,7 +112,7 @@
         <!-- 交易表單-E -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">DataTable with minimal features &amp; hover style</h3>
+            <h3 class="card-title">外幣交易紀錄</h3>
           </div>
           <!-- /.card-header -->
           <div class="card-body">

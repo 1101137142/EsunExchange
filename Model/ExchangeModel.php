@@ -33,7 +33,8 @@ class ExchangeModel extends Model {
     return $row;
   }
 
-  function getExchangeCurrencyNowRate($TradingCurrency, $TradingTime = '') {
+  function getExchangeCurrencyNowRate($schRecordCurrency, $date) {
+    if($date)
     $date = new DateTime($TradingTime);
     $curl = curl_init();
     curl_setopt_array($curl, array(

@@ -1,5 +1,6 @@
 var now_format = '';
 $(function () {
+  //設定日期格式遮罩
   var now = new Date();
   now_format = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate()) + " " + (now.getHours() < 10 ? '0' : '') + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
   $('#TradingTime').daterangepicker({
@@ -14,6 +15,29 @@ $(function () {
     }}, function (start, end, label) {
     //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
   });
+  
+  //設定抓取紀錄的日期範圍format
+  var todate = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
+  now.setDate(now.getDate() - 90);
+  var NintyDayAgo = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
+  $('#schRecordDateRange').daterangepicker({
+    "startDate": NintyDayAgo,
+    "endDate": todate,
+    //"autoApply": true,
+    locale: {
+      "separator": " ~ ",
+      format: 'YYYY-MM-DD'
+    }}, function (start, end, label) {
+    //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  });
+  //設定日期區間套件的取消事件
+  $('#schRecordDateRange').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val('');
+  });
+  //初始設為空白
+  $('#schRecordDateRange').val('');
+
+  //取得幣別資料
   var url = "index.php?action=TradingRecordAction";
   $.ajax({
     type: "POST",
@@ -36,6 +60,7 @@ $(function () {
       console.log(data);
     }
   });
+  //取得有做過交易的幣別資料
   $.ajax({
     type: "POST",
     url: url,
@@ -97,12 +122,10 @@ function saveform() {
       console.log(data);
     }
   });
-
-
 }
+//取得交易匯率(
 function getRate() {
   var ins_val = new Object();
-  //ins_val['TradingType']=$('#TradingType').val();
   ins_val['TradingTime'] = $('#TradingTime').val();
   ins_val['TradingCurrency'] = $('#TradingCurrency').val();
   //console.log(ins_val);
@@ -134,15 +157,16 @@ function getRate() {
     }
   });
 }
-
+//取得交易紀錄
 function getRecord() {
   var sch_val = new Object();
-  var date=new Object();
-  if($('#date_range').val().replace(/\s/g, '')!=''){
-     date= $('#date_range').val().replace(/\s/g, '').split('~');
+  var date = new Object();
+  if ($('#schRecordDateRange').val().replace(/\s/g, '') != '') {
+    date = $('#schRecordDateRange').val().replace(/\s/g, '').split('~');
   }
-  sch_val['TradingCurrency'] = $('#TradingCurrency').val();
-  //console.log(ins_val);
+  sch_val['schRecordCurrency'] = $('#schRecordCurrency').val();
+  sch_val['date'] = date;
+  console.log(sch_val);
   var url = "index.php?action=TradingRecordAction";
   $.ajax({
     type: "POST",
@@ -152,27 +176,27 @@ function getRecord() {
     success: function (data)
     {
       console.log(data);
-      var count_data=0;
-      var trading_table_body_html='';
+      /*var count_data = 0;
+      var trading_table_body_html = '';
       $.each(data['BoardRate'], function (k, v) {
-        if(count_data%2==0){
-          trading_table_body_html+='<tr role="row" class="odd">';          
-        }else{
-          trading_table_body_html+='<tr role="row" class="even">';          
+        if (count_data % 2 == 0) {
+          trading_table_body_html += '<tr role="row" class="odd">';
+        } else {
+          trading_table_body_html += '<tr role="row" class="even">';
         }
-        trading_table_body_html+='<td>'+v['tr_type']+'</td>';//買賣類別
-        trading_table_body_html+='<td>'+v['tr_currency']+'</td>';//幣別
-        trading_table_body_html+='<td>'+v['tr_LocalCurrencyTurnover']+'</td>';//本幣金額
-        trading_table_body_html+='<td>'+v['tr_ForeignCurrencyTurnover']+'</td>';//外幣金額
-        trading_table_body_html+='<td>'+v['tr_rate']+'</td>';//交易匯率
+        trading_table_body_html += '<td>' + v['tr_type'] + '</td>';//買賣類別
+        trading_table_body_html += '<td>' + v['tr_currency'] + '</td>';//幣別
+        trading_table_body_html += '<td>' + v['tr_LocalCurrencyTurnover'] + '</td>';//本幣金額
+        trading_table_body_html += '<td>' + v['tr_ForeignCurrencyTurnover'] + '</td>';//外幣金額
+        trading_table_body_html += '<td>' + v['tr_rate'] + '</td>';//交易匯率
         count_data++;
       })
-      $('#trading_table_body').html(trading_table_body_html);
-      
-      
+      $('#trading_table_body').html(trading_table_body_html);*/
+
+
     },
     error: function (data) {
-      console.log(ins_val);
+      //console.log(ins_val);
       console.log('An error occurred.');
       console.log(data);
     }
@@ -180,6 +204,7 @@ function getRecord() {
 
 
 }
+//重設新增用的交易資料表單
 function reset() {
   var now = new Date();
   now_format = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate()) + " " + (now.getHours() < 10 ? '0' : '') + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
@@ -187,14 +212,15 @@ function reset() {
   $('#TradingTime').val(now_format);
   getRate();
 }
+//取得現在時間並設為交易時間
 function setTime() {
   var now = new Date();
   now_format = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate()) + " " + (now.getHours() < 10 ? '0' : '') + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
   $('#TradingTime').val(now_format);
-  if($('#TradingType').val()=='1'){
+  if ($('#TradingType').val() == '1') {
     console.log($('#TradingType').val());
     $('#ForeignCurrencyTurnover').val('');
-  }else if($('#TradingType').val()=='0'){
+  } else if ($('#TradingType').val() == '0') {
     console.log($('#TradingType').val());
     $('#LocalCurrencyTurnover').val('');
   }
@@ -242,14 +268,11 @@ $('form').on('change', '#LocalCurrencyTurnover', function () {
 })
 $('form').on('change', '#ForeignCurrencyTurnover', function () {
   //console.log($(this).val());
-  if ($('#TradingRate').val() != '' && ($('#LocalCurrencyTurnover').val() == '' || parseFloat($('#LocalCurrencyTurnover').val() == 0))) {
+  if ($('#TradingRate').val() != '' && ($('#LocalCurrencyTurnover').val() == '' || parseFloat($('#LocalCurrencyTurnover').val()) == 0)) {
     $('#LocalCurrencyTurnover').val(Math.round($('#ForeignCurrencyTurnover').val() * $('#TradingRate').val() * 100) / 100);
   }
 })
 
-$('.schRecordForm').change(function(){
-  
+$('.schRecordForm').change(function () {
+  console.log($(this).val());
 })
-/*$('#LocalCurrencyTurnover').change(function(){
- console.log($(this).val());
- })*/
