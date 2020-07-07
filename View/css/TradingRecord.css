@@ -2,5 +2,23 @@
   max-width: 120px;
 }
 #schRecordDateRange{
-  max-width: 120px;
+  max-width: 190px;
+}
+#trading_table_tr_type{
+  width:7%;
+}
+#trading_table_tr_currency{
+  width:10%;
+}
+#trading_table_tr_LocalCurrencyTurnover{
+  width:25%;
+}
+#trading_table_tr_ForeignCurrencyTurnover{
+  width:25%;
+}
+#trading_table_tr_rate{
+  width:10%;
+}
+#trading_table_tr_tradingtime{
+  width:23%;
 }

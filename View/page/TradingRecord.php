@@ -130,34 +130,35 @@
                 </div>
               </div>
             </div>
-           <!--交易資料列表-->
+            <!--交易資料列表-->
             <div id="trading_table_wrapper" class="dataTables_wrapper dt-bootstrap4">
               <div class="row">
                 <div class="col-sm-12">
                   <table id="trading_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="trading_table_info">
                     <thead>
                       <tr role="row">
-                        <th class="sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column ascending">買/賣</th>
-                        <th class="sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">幣別</th>
-                        <th class="sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">本幣金額</th>
-                        <th class="sorting_desc" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending" aria-sort="descending">外幣金額</th>
-                        <th class="sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">匯率</th>
+                        <th id="trading_table_tr_type" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >買/賣</th>
+                        <th id="trading_table_tr_currency" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >幣別</th>
+                        <th id="trading_table_tr_LocalCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >本幣金額</th>
+                        <th id="trading_table_tr_ForeignCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >外幣金額</th>
+                        <th id="trading_table_tr_rate" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >匯率</th>
+                        <th id="trading_table_tr_tradingtime" class="trading_table  sorting_asc" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >交易時間</th>
                       </tr>
                     </thead>
                     <tbody id="trading_table_body">
                       <tr role="row" class="odd">
-                        <td class="">Webkit</td>
-                        <td>Safari 3.0</td>
-                        <td>OSX.4+</td>
-                        <td class="sorting_1">522.1</td>
-                        <td>A</td>
+                        <td class="">Demo</td>
+                        <td>Demo</td>
+                        <td>Demo</td>
+                        <td class="sorting_1">Demo</td>
+                        <td>Demo</td>
                       </tr>
                       <tr role="row" class="even">
-                        <td class="">Webkit</td>
-                        <td>iPod Touch / iPhone</td>
-                        <td>iPod</td>
-                        <td class="sorting_1">420.1</td>
-                        <td>A</td>
+                        <td class="">Demo</td>
+                        <td>Demo</td>
+                        <td>Demo</td>
+                        <td class="sorting_1">Demo</td>
+                        <td>Demo</td>
                       </tr>
                     </tbody>
                     <tfoot>
@@ -165,7 +166,8 @@
                         <th rowspan="1" colspan="1">幣別</th>
                         <th rowspan="1" colspan="1">本幣金額</th>
                         <th rowspan="1" colspan="1">外幣金額</th>
-                        <th rowspan="1" colspan="1">匯率</th></tr>
+                        <th rowspan="1" colspan="1">匯率</th>
+                        <th rowspan="1" colspan="1">交易時間</th></tr>
                     </tfoot>
                   </table>
                 </div>
@@ -181,7 +183,7 @@
                         <a href="#" aria-controls="trading_table" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
                       </li>
                       <li class="paginate_button page-item active"><a href="#" aria-controls="trading_table" data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
-                     <li class="paginate_button page-item active">...</li> 
+                      <li class="paginate_button page-item active">...</li> 
                       <li class="paginate_button page-item "><a href="#" aria-controls="trading_table" data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
                       <li class="paginate_button page-item "><a href="#" aria-controls="trading_table" data-dt-idx="3" tabindex="0" class="page-link">3</a></li>
                       <li class="paginate_button page-item "><a href="#" aria-controls="trading_table" data-dt-idx="4" tabindex="0" class="page-link">4</a></li>

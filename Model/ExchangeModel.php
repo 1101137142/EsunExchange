@@ -25,6 +25,7 @@ class ExchangeModel extends Model {
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $row;
   }
+
   function getTradingRecordCurrency() {
     $sql = "SELECT DISTINCT tr_currency,CurrencyName FROM `trading_record` left join currencydata on tr_currency=CurrencyCode ";
     $stmt = $this->cont->prepare($sql);
@@ -33,9 +34,11 @@ class ExchangeModel extends Model {
     return $row;
   }
 
-  function getExchangeCurrencyNowRate($schRecordCurrency, $date) {
-    if($date)
-    $date = new DateTime($TradingTime);
+  function getExchangeCurrencyNowRate($TradingCurrency, $TradingTime = '') {
+    if ($TradingTime) {
+      $date = new DateTime($TradingTime);
+    }
+
     $curl = curl_init();
     curl_setopt_array($curl, array(
         CURLOPT_URL => "https://www.esunbank.com.tw/bank/Layouts/esunbank/Deposit/DpService.aspx/GetForeignExchageRate",
@@ -91,9 +94,40 @@ class ExchangeModel extends Model {
     $sql = "INSERT INTO `trading_record`( `tr_type`, `tr_tradingtime`, `tr_currency`, `tr_rate`, `tr_LocalCurrencyTurnover`, `tr_ForeignCurrencyTurnover`)  ";
     $sql .= "VALUES (:TradingType,:TradingTime,:TradingCurrency,:TradingRate,:LocalCurrencyTurnover,:ForeignCurrencyTurnover)";
     $stmt = $this->cont->prepare($sql);
-    $status[] = $stmt->execute(array(':TradingType' => $TradingType,':TradingTime'=>$TradingTime, ':TradingCurrency' => $TradingCurrency, ':TradingRate' => $TradingRate, ':LocalCurrencyTurnover' => $LocalCurrencyTurnover, ':ForeignCurrencyTurnover' => $ForeignCurrencyTurnover));
+    $status[] = $stmt->execute(array(':TradingType' => $TradingType, ':TradingTime' => $TradingTime, ':TradingCurrency' => $TradingCurrency, ':TradingRate' => $TradingRate, ':LocalCurrencyTurnover' => $LocalCurrencyTurnover, ':ForeignCurrencyTurnover' => $ForeignCurrencyTurnover));
     //$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $status;
+  }
+
+  function getExchangeTradingRecord($schRecordCurrency, $date, $orderby, $pageNum) {
+    $sqlWhere = ' 1=1 ';
+    if ($schRecordCurrency != 'ALL') {
+      if ($sqlWhere != '') {
+        $sqlWhere .= ' and ';
+      }
+      $sqlWhere .= " tr_currency= '" . $schRecordCurrency . "'";
+    }
+    if ($date != 'ALL') {
+      if ($sqlWhere != '') {
+        $sqlWhere .= ' and ';
+      }
+      $sqlWhere .= " date(tr_tradingtime) between '" . $date[0] . "' and '" . $date[1] . "'";
+    }
+    //$status = $sqlWhere;
+    $firstData = ($pageNum - 1) * 10;
+    $sqlCount = "SELECT * FROM `trading_record` left join currencydata on tr_currency=CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby,tr_rid ";
+    $stmtCount = $this->cont->prepare($sqlCount);
+    $status[] = $stmtCount->execute();
+    $rowcount = $stmtCount->rowCount();
+
+    $sql = "SELECT * FROM `trading_record` left join currencydata on tr_currency=CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby,tr_rid limit $firstData,10";
+    //$status = $sql;
+    $stmt = $this->cont->prepare($sql);
+    $status[] = $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data['row'] = $row;
+    $data['rowcount'] = $rowcount;
+    return $data;
   }
 
 }

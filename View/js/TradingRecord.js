@@ -15,7 +15,6 @@ $(function () {
     }}, function (start, end, label) {
     //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
   });
-  
   //設定抓取紀錄的日期範圍format
   var todate = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
   now.setDate(now.getDate() - 90);
@@ -31,12 +30,11 @@ $(function () {
     //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
   });
   //設定日期區間套件的取消事件
-  $('#schRecordDateRange').on('cancel.daterangepicker', function(ev, picker) {
-      $(this).val('');
+  $('#schRecordDateRange').on('cancel.daterangepicker', function (ev, picker) {
+    $(this).val('');
   });
   //初始設為空白
   $('#schRecordDateRange').val('');
-
   //取得幣別資料
   var url = "index.php?action=TradingRecordAction";
   $.ajax({
@@ -82,7 +80,7 @@ $(function () {
       console.log(data);
     }
   });
-
+  getRecord(1);
 })
 function saveform() {
   var form_check = 1;
@@ -158,7 +156,7 @@ function getRate() {
   });
 }
 //取得交易紀錄
-function getRecord() {
+function getRecord(pageNum) {
   var sch_val = new Object();
   var date = new Object();
   if ($('#schRecordDateRange').val().replace(/\s/g, '') != '') {
@@ -166,6 +164,18 @@ function getRecord() {
   }
   sch_val['schRecordCurrency'] = $('#schRecordCurrency').val();
   sch_val['date'] = date;
+  $.each($('.trading_table'), function (k, v) {
+    if (!$(this).hasClass('sorting')) {
+      sch_val['orderby'] = $(this).attr('id').replace("trading_table_", "");
+      if ($(this).hasClass('sorting_asc')) {
+        sch_val['orderby'] += ' asc';
+      } else if ($(this).hasClass('sorting_desc')) {
+        sch_val['orderby'] += ' desc';
+      }
+    }
+  })
+  //sch_val['orderby'] = 'tr_tradingtime desc';
+  sch_val['pageNum'] = pageNum;
   console.log(sch_val);
   var url = "index.php?action=TradingRecordAction";
   $.ajax({
@@ -176,24 +186,128 @@ function getRecord() {
     success: function (data)
     {
       console.log(data);
-      /*var count_data = 0;
+      var count_data = 0;
       var trading_table_body_html = '';
-      $.each(data['BoardRate'], function (k, v) {
+      var show_type = '';
+      var table_field = new Array();
+      $.each($('.trading_table'), function (k, v) {
+        table_field[k] = $(this).attr('id').replace("trading_table_", "");
+      })
+      console.log(table_field);
+      $.each(data['row'], function (k, v) {
         if (count_data % 2 == 0) {
           trading_table_body_html += '<tr role="row" class="odd">';
         } else {
           trading_table_body_html += '<tr role="row" class="even">';
         }
-        trading_table_body_html += '<td>' + v['tr_type'] + '</td>';//買賣類別
-        trading_table_body_html += '<td>' + v['tr_currency'] + '</td>';//幣別
-        trading_table_body_html += '<td>' + v['tr_LocalCurrencyTurnover'] + '</td>';//本幣金額
-        trading_table_body_html += '<td>' + v['tr_ForeignCurrencyTurnover'] + '</td>';//外幣金額
-        trading_table_body_html += '<td>' + v['tr_rate'] + '</td>';//交易匯率
+        var show_data = '';
+        $.each(table_field, function (k1, v1) {
+          if (v1 == 'tr_type') {
+            switch (v['tr_type']) {
+              case '0':
+                show_data = '賣';
+                break;
+              case '1':
+                show_data = '買';
+                break;
+              case '9':
+                show_data = '利息';
+                break;
+            }
+          } else if (v1 == 'tr_currency') {
+            show_data = v['CurrencyName'] + '(' + v[v1] + ')';
+          } else {
+            show_data = v[v1];
+          }
+          if (v1 == 'tr_LocalCurrencyTurnover' || v1 == 'tr_ForeignCurrencyTurnover' || v1 == 'tr_rate' || v1 == 'tr_tradingtime') {
+            trading_table_body_html += '<td class="text-right" >' + show_data + '</td>';
+          } else {
+            trading_table_body_html += '<td>' + show_data + '</td>';
+          }
+        })
         count_data++;
       })
-      $('#trading_table_body').html(trading_table_body_html);*/
+      console.log(trading_table_body_html);
+      $('#trading_table_body').html(trading_table_body_html);
+      var max_page = Math.ceil(data['rowcount'] / 10);
+      console.log(max_page);
+      //設定頁尾頁數連結
 
+      var pagination_html = '';
+      var isNowPage = '';
+      //如果總頁數不超過五頁 直接列出
+      if (max_page < 6) {
+        for (var i = 1; i < max_page; i++) {
+          pagination_html += ' <li class="paginate_button page-item ';
+          if (i == pageNum) {
+            pagination_html += ' active ';
+          } else {
+            pagination_html += ' onclick="getRecord(' + i + ')';
+          }
+          pagination_html += ' "><a href="#" aria-controls="trading_table" data-dt-idx="' + i + '" tabindex="0" class="page-link">' + i + '</a></li>';
+        }
+      } else {
+        //如果超過五頁 判斷現在頁數是不是大於第三頁 是的話需要做省略
+        if (pageNum > 3) {
+          pagination_html += '<li class="paginate_button page-item previous " id="trading_table_previous" onclick="getRecord(' + (pageNum - 1) + ')"> <a href="#" data-dt-idx="0" tabindex="0" class="page-link">Previous</a> </li>';
+          pagination_html += '<li class="paginate_button page-item "  onclick="getRecord(1)"><a href="#"  data-dt-idx="1" tabindex="0" class="page-link">1</a></li>';
+          if (pageNum > 4) {
+            pagination_html += '<li class="paginate_button page-item ">...</li> ';
+          }
+        } else if (pageNum != '1') {
+          pagination_html += '<li class="paginate_button page-item previous " id="trading_table_previous" onclick="getRecord(' + (pageNum - 1) + ')"> <a href="#" data-dt-idx="0" tabindex="0" class="page-link">Previous</a> </li>';
+        }
+        //此部分是中間頁數判斷 如果現在頁面扣掉必須要顯示的兩頁會造成溢位 那就需要減少顯示的頁數(現在頁數為1 則顯示3頁  2為4頁)
+        if (pageNum - 2 < 1) {
+          for (var i = 0; i < pageNum + 2; i++) {
+            isNowPage = '';
+            if (pageNum == parseInt(i + 1)) {
+              isNowPage = ' active ';
+            }
+            pagination_html += '<li class="paginate_button page-item ' + isNowPage + '" ><a href="#" onclick="getRecord(' + parseInt(i + 1) + ')" aria-controls="trading_table" data-dt-idx="' + parseInt(i + 1) + '" tabindex="0" class="page-link">' + parseInt(i + 1) + '</a></li>'
+          }
+          //此部分為最大頁數判斷 如果最大頁數-2大於現在頁數 那代表可以正常顯示五頁
+        } else if (pageNum < max_page - 2) {
+          var hrefPageNum = 0;
+          for (var i = 0; i < 5; i++) {
+            hrefPageNum = parseInt(pageNum + i) - 2;
 
+            isNowPage = '';
+            if (pageNum == hrefPageNum) {
+              isNowPage = ' active ';
+            }
+            console.log(hrefPageNum);
+            pagination_html += '<li class="paginate_button page-item' + isNowPage + ' " onclick="getRecord(' + hrefPageNum + ')"><a href="#" aria-controls="trading_table" data-dt-idx="' + hrefPageNum + '" tabindex="0" class="page-link">' + hrefPageNum + '</a></li>';
+            console.log(pagination_html);
+          }
+          //如果最大頁數-2沒有大於現在頁數 代表顯示頁數需要減少
+        } else if (pageNum >= max_page - 2) {
+
+          var hrefPageNum = 0;
+          for (var i = 0; i < 3 + (max_page - pageNum); i++) {
+            hrefPageNum = parseInt(pageNum + i) - 2;
+            console.log(hrefPageNum);
+            isNowPage = '';
+            if (pageNum == hrefPageNum) {
+              isNowPage = ' active ';
+            }
+            pagination_html += '<li class="paginate_button page-item' + isNowPage + ' " onclick="getRecord(' + hrefPageNum + ')"><a href="#" aria-controls="trading_table" data-dt-idx="' + hrefPageNum + '" tabindex="0" class="page-link">' + hrefPageNum + '</a></li>'
+          }
+          console.log(pagination_html);
+        }
+        if (pageNum < max_page - 2) {
+          if (pageNum < max_page - 3) {
+            pagination_html += '<li class="paginate_button page-item ">...</li> ';
+          }
+          pagination_html += '<li class="paginate_button page-item "  onclick="getRecord(' + max_page + ')" ><a href="#"  data-dt-idx="' + max_page + '" tabindex="0" class="page-link">' + max_page + '</a></li>';
+          pagination_html += '<li class="paginate_button page-item next" id="trading_table_next"  onclick="getRecord(' + parseInt(pageNum + 1) + ')" ><a href="#" aria-controls="trading_table" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>';
+        } else if (pageNum != max_page) {
+          pagination_html += '<li class="paginate_button page-item next" id="trading_table_next"  onclick="getRecord(' + parseInt(pageNum + 1) + ')" ><a href="#" aria-controls="trading_table" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>';
+        }
+
+      }
+      $('#trading_table_info').html('Showing ' + parseInt((pageNum - 1) * 10 + 1) + ' to ' + pageNum * 10 + ' of ' + data['rowcount'] + ' entries');
+      $('.pagination').html(pagination_html);
     },
     error: function (data) {
       //console.log(ins_val);
@@ -201,8 +315,6 @@ function getRecord() {
       console.log(data);
     }
   });
-
-
 }
 //重設新增用的交易資料表單
 function reset() {
@@ -231,7 +343,7 @@ $('form').on('change', '#TradingTime', function () {
   if ($('#TradingTime').val() != '' && $('#TradingCurrency').val() != '') {
     getRate();
   }
-  //console.log($(this).val());
+//console.log($(this).val());
 })
 
 
@@ -261,18 +373,34 @@ $('#TradingRate').change(function () {
 
 
 $('form').on('change', '#LocalCurrencyTurnover', function () {
-  //console.log($(this).val());
+//console.log($(this).val());
   if ($('#TradingRate').val() != '' && ($('#ForeignCurrencyTurnover').val() == '' || parseFloat($('#ForeignCurrencyTurnover').val()) == 0)) {
     $('#ForeignCurrencyTurnover').val(Math.round($('#LocalCurrencyTurnover').val() / $('#TradingRate').val() * 100) / 100);
   }
 })
 $('form').on('change', '#ForeignCurrencyTurnover', function () {
-  //console.log($(this).val());
+//console.log($(this).val());
   if ($('#TradingRate').val() != '' && ($('#LocalCurrencyTurnover').val() == '' || parseFloat($('#LocalCurrencyTurnover').val()) == 0)) {
     $('#LocalCurrencyTurnover').val(Math.round($('#ForeignCurrencyTurnover').val() * $('#TradingRate').val() * 100) / 100);
   }
 })
 
 $('.schRecordForm').change(function () {
-  console.log($(this).val());
+//console.log($(this).val());
+  getRecord(1);
+})
+$('.trading_table').on('click', function () {
+//console.log($(this).attr('id'));
+  if ($(this).hasClass('sorting') || $(this).hasClass('sorting_asc')) {
+    $('.trading_table').removeClass('sorting sorting_asc sorting_desc');
+    $('.trading_table').addClass('sorting');
+    $(this).removeClass('sorting');
+    $(this).addClass('sorting_desc');
+  } else {
+    $('.trading_table').removeClass('sorting sorting_asc sorting_desc');
+    $('.trading_table').addClass('sorting');
+    $(this).removeClass('sorting');
+    $(this).addClass('sorting_asc');
+  }
+  getRecord(1);
 })

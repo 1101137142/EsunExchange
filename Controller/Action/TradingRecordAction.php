@@ -24,18 +24,20 @@ class TradingRecordAction implements actionPerformed {
 
       case 'getExchangeTradingRecord'://取得交易紀錄
         if (empty($_POST['data']['schRecordCurrency'])) {
-          $schRecordCurrency = "ALL";
+          $schRecordCurrency = 'ALL';
         } else {
           $schRecordCurrency = $_POST['data']['schRecordCurrency']; //紀錄幣別
         }
         //如果沒有輸入日期
         if (empty($_POST['data']['date'])) {
-          $date = "ALL";
+          $date = 'ALL';
         } else {
           $date = $_POST['data']['date']; //紀錄日期區間
         }
+        $orderby=$_POST['data']['orderby'];
+        $pageNum=$_POST['data']['pageNum'];
         //取得要回傳的資料
-        $returnData = $ExchangeModel->getExchangeCurrencyNowRate($schRecordCurrency, $date);
+        $returnData = $ExchangeModel->getExchangeTradingRecord($schRecordCurrency, $date,$orderby,$pageNum);
         //$returnData =$schRecordCurrency;
         break;
 
