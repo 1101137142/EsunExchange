@@ -99,7 +99,7 @@ class ExchangeModel extends Model {
     return $status;
   }
 
-  function getExchangeTradingRecord($schRecordCurrency, $date, $orderby, $pageNum) {
+  function getExchangeTradingRecord($schRecordCurrency, $date, $orderby, $Inverted, $pageNum) {
     $sqlWhere = ' 1=1 ';
     if ($schRecordCurrency != 'ALL') {
       if ($sqlWhere != '') {
@@ -120,8 +120,11 @@ class ExchangeModel extends Model {
     $status[] = $stmtCount->execute();
     $rowcount = $stmtCount->rowCount();
 
-    $sql = "SELECT * FROM `trading_record` left join currencydata on tr_currency=CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby,tr_rid limit $firstData,10";
-    //$status = $sql;
+    $sql = "SELECT * ";
+    $sql .= ",(SELECT sum(temp.tr_LocalCurrencyTurnover) FROM trading_record temp WHERE (temp.tr_tradingtime<T0.tr_tradingtime or(temp.tr_tradingtime=T0.tr_tradingtime and temp.tr_rid<T0.tr_rid)or(temp.tr_rid=T0.tr_rid)) and temp.tr_currency=T0.tr_currency ) TotalLCT";
+    $sql .= ",(SELECT sum(temp.tr_ForeignCurrencyTurnover) FROM trading_record temp WHERE (temp.tr_tradingtime<T0.tr_tradingtime or(temp.tr_tradingtime=T0.tr_tradingtime and temp.tr_rid<T0.tr_rid)or(temp.tr_rid=T0.tr_rid)) and temp.tr_currency=T0.tr_currency ) TotalFCT";
+    $sql .= " FROM `trading_record` T0 left join currencydata T1 on T0.tr_currency=T1.CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby $Inverted,tr_rid $Inverted limit $firstData,10";
+    //$row = $sql;
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -11,14 +11,29 @@
   width:10%;
 }
 #trading_table_tr_LocalCurrencyTurnover{
-  width:25%;
+  width:12%;
 }
 #trading_table_tr_ForeignCurrencyTurnover{
-  width:25%;
+  width:12%;
+}
+#trading_table_TotalLCT{
+  width:13%;
+}
+#trading_table_TotalFCT{
+  width:13%;
 }
 #trading_table_tr_rate{
   width:10%;
 }
+#trading_table_cost_rate{
+  width:10%;
+}
 #trading_table_tr_tradingtime{
-  width:23%;
+  width:13%;
+}
+.buyRecord{
+  background-color: #de6a6a70;
+}
+.sellRecord{
+  background-color: #a1de6a70;
 }

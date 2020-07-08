@@ -168,9 +168,9 @@ function getRecord(pageNum) {
     if (!$(this).hasClass('sorting')) {
       sch_val['orderby'] = $(this).attr('id').replace("trading_table_", "");
       if ($(this).hasClass('sorting_asc')) {
-        sch_val['orderby'] += ' asc';
+        sch_val['Inverted'] = ' asc';
       } else if ($(this).hasClass('sorting_desc')) {
-        sch_val['orderby'] += ' desc';
+        sch_val['Inverted'] = ' desc';
       }
     }
   })
@@ -194,11 +194,25 @@ function getRecord(pageNum) {
         table_field[k] = $(this).attr('id').replace("trading_table_", "");
       })
       console.log(table_field);
+
       $.each(data['row'], function (k, v) {
+        var backGroundColor = '';
+        switch (v['tr_type']) {
+          case '0':
+            backGroundColor = 'sellRecord';
+            break;
+          case '1':
+            backGroundColor = 'buyRecord';
+            break;
+          default:
+            backGroundColor = '';
+            break;
+        }
+
         if (count_data % 2 == 0) {
-          trading_table_body_html += '<tr role="row" class="odd">';
+          trading_table_body_html += '<tr role="row" class="odd ' + backGroundColor + ' ">';
         } else {
-          trading_table_body_html += '<tr role="row" class="even">';
+          trading_table_body_html += '<tr role="row" class="even ' + backGroundColor + ' ">';
         }
         var show_data = '';
         $.each(table_field, function (k1, v1) {
@@ -216,6 +230,20 @@ function getRecord(pageNum) {
             }
           } else if (v1 == 'tr_currency') {
             show_data = v['CurrencyName'] + '(' + v[v1] + ')';
+          } else if (v1 == 'tr_LocalCurrencyTurnover') {
+            //show_data = v[v1] + '(' + parseFloat(v['TotalLCT']).toFixed(0) + ')';
+            show_data = v[v1];
+          } else if (v1 == 'tr_ForeignCurrencyTurnover') {
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
+            show_data = v[v1];
+          } else if (v1 == 'TotalLCT') {
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
+            show_data = parseFloat(v[v1]).toFixed(0);
+          } else if (v1 == 'TotalFCT') {
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
+            show_data = parseFloat(v[v1]).toFixed(v['DecimalPlaces'])*1;
+          } else if (v1 == 'cost_rate') {
+            show_data = Math.abs(parseFloat(parseFloat(v['TotalLCT']).toFixed(0) / parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces'])).toFixed(v['DecimalPlaces']));
           } else {
             show_data = v[v1];
           }

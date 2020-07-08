@@ -34,10 +34,11 @@ class TradingRecordAction implements actionPerformed {
         } else {
           $date = $_POST['data']['date']; //紀錄日期區間
         }
-        $orderby=$_POST['data']['orderby'];
-        $pageNum=$_POST['data']['pageNum'];
+        $orderby = $_POST['data']['orderby']; //主要排序欄位
+        $Inverted = $_POST['data']['Inverted']; //順排或倒排
+        $pageNum = $_POST['data']['pageNum'];
         //取得要回傳的資料
-        $returnData = $ExchangeModel->getExchangeTradingRecord($schRecordCurrency, $date,$orderby,$pageNum);
+        $returnData = $ExchangeModel->getExchangeTradingRecord($schRecordCurrency, $date, $orderby,$Inverted, $pageNum);
         //$returnData =$schRecordCurrency;
         break;
 

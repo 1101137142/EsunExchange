@@ -142,6 +142,9 @@
                         <th id="trading_table_tr_LocalCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >本幣金額</th>
                         <th id="trading_table_tr_ForeignCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >外幣金額</th>
                         <th id="trading_table_tr_rate" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >匯率</th>
+                        <th id="trading_table_TotalLCT" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總投入金額</th>
+                        <th id="trading_table_TotalFCT" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總外幣金額</th>
+                        <th id="trading_table_cost_rate" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >成本</th>
                         <th id="trading_table_tr_tradingtime" class="trading_table  sorting_asc" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >交易時間</th>
                       </tr>
                     </thead>
@@ -161,14 +164,14 @@
                         <td>Demo</td>
                       </tr>
                     </tbody>
-                    <tfoot>
+                    <!--tfoot>
                       <tr><th rowspan="1" colspan="1">買/賣</th>
                         <th rowspan="1" colspan="1">幣別</th>
                         <th rowspan="1" colspan="1">本幣金額</th>
                         <th rowspan="1" colspan="1">外幣金額</th>
                         <th rowspan="1" colspan="1">匯率</th>
                         <th rowspan="1" colspan="1">交易時間</th></tr>
-                    </tfoot>
+                    </tfoot-->
                   </table>
                 </div>
               </div>
