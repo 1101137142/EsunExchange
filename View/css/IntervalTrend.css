@@ -27,3 +27,15 @@
 #base_multiple {
   max-width: 100px;
 }
+#capital{
+  max-width: 90px;
+
+}
+#currency{
+  max-width: 140px;
+
+}
+#date_range{
+  max-width: 200px;
+
+}

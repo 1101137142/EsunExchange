@@ -11,7 +11,7 @@ class ExchangeModel extends Model {
   }
 
   function getExchangeDataByRnage($currency, $date_start, $date_end) {
-    $sql = "SELECT * FROM `rates_hl` WHERE `rhl_currency` = :rhl_currency and `rhl_date` between '" . $date_start . "' and '" . $date_end . "'";
+    $sql = "SELECT * FROM `rates_hl` left join currencydata on rhl_currency=CurrencyCode WHERE `rhl_currency` = :rhl_currency and `rhl_date` between '" . $date_start . "' and '" . $date_end . "'";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute(array(':rhl_currency' => $currency));
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);

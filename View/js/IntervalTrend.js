@@ -3,6 +3,7 @@ var lineChart = {};
 var tmp_single = {};
 var lineChart_single = {};
 $(function () {
+  $('#refreshTime').val('4');
   //window.setInterval(getSingleDayExchangeData(), 60);
   var areaChartData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -136,7 +137,7 @@ $(function () {
   });
 })
 
-
+//取得區間資料
 function getRangeExchangeData() {
   var date = $('#date_range').val().replace(/\s/g, '').split('~');
   var currency = $('#currency').val();
@@ -156,15 +157,36 @@ function getRangeExchangeData() {
       data: {date: date, currency: currency, doExchangeAction: 'getExchangeDataByRange'}, // serializes the form's elements.
       success: function (data)
       {
-        //console.log(data);
+
+        console.log(data);
         var High = new Array();
         var Low = new Array();
+        var Max = 0;
+        var Min = 9999;
         var HL_date = new Array();
         $.each(data, function (k, v) {
+          if (v['rhl_highprice'] > Max) {
+            Max = v['rhl_highprice'];
+          }
+          if (v['rhl_lowprice'] < Min) {
+            Min = v['rhl_lowprice'];
+            Max = 0;
+          }
           HL_date[k] = v['rhl_date'];
           High[k] = {x: v['rhl_date'], y: v['rhl_highprice']};
           Low[k] = {x: v['rhl_date'], y: v['rhl_lowprice']};
         })
+        var fee = parseFloat(data[0]['BidAsk_spread'] - (data[0]['OnlineBankDiscount'] * 2)).toFixed(data[0]['DecimalPlaces']);
+        var gap = parseFloat(Max - fee - Min).toFixed(data[0]['DecimalPlaces']);
+        var OperatingReportingRate = (parseFloat(gap / Min * 100).toFixed(data[0]['DecimalPlaces']));
+        var range_gap_html = '區間價差：' + gap + '元(' + Min + '/' + Max + ';手續費:' + fee + ') | 區間報酬率：' + OperatingReportingRate + '%';
+        if (parseInt($('#capital').val()) > 0 && $('#capital').val() != '') {
+
+          range_gap_html += ' | 可產生收益:' + Math.floor((parseInt($('#capital').val()) * OperatingReportingRate) / 100);
+        }
+
+        $('#range_gap').html(range_gap_html);
+
         tmp.data.labels = HL_date;
         /*tmp.data.labels.unshift(rd);
          tmp.data.labels.push(ad);*/
@@ -203,25 +225,23 @@ function getSingleDayExchangeData() {
         if (data.length) {
           var now_data = '';
           var BaseNum = 1;
-          var MaxFloatNum = 0;
+          var MaxFloatNum = data[0]['DecimalPlaces'];
           var High_price = 0;
           var Low_price = 0;
-          for (var i = 0; i < 10; i++) {
-            var tmpBaseNum = 1;
-            var test_count = 0;
-            var test_val = data[i]['rd_sellrate'];
-            test_val = test_val.split('.');
-            try {
-              if (test_val[1].length > MaxFloatNum) {
-                MaxFloatNum = test_val[1].length;
-              }
-            } catch (error) {
-              console.log(error);
-              console.log(test_val);
-            }
-
-
-          }
+          /*for (var i = 0; i < 10; i++) {
+           var tmpBaseNum = 1;
+           var test_count = 0;
+           var test_val = data[i]['rd_sellrate'];
+           test_val = test_val.split('.');
+           try {
+           if (test_val[1].length > MaxFloatNum) {
+           MaxFloatNum = test_val[1].length;
+           }
+           } catch (error) {
+           console.log(error);
+           console.log(test_val);
+           }
+           }*/
           for (var i = 0; i < MaxFloatNum; i++) {
             BaseNum = BaseNum / 10;
           }
@@ -241,7 +261,7 @@ function getSingleDayExchangeData() {
           var OnlineBankDiscount = data[0]['OnlineBankDiscount'];//網銀優惠
 
           $.each(data, function (k, v) {
-            
+
             if (parseFloat(v['rd_sellrate']) > High_price) {
               High_price = parseFloat(v['rd_sellrate']);
             }
@@ -255,9 +275,9 @@ function getSingleDayExchangeData() {
              }*/
             var ShowTime = (v['H'] < 10 ? '0' : '') + v['H'] + ':' + (v['M'] < 10 ? '0' : '') + v['M'] + ':' + (v['S'] < 10 ? '0' : '') + v['S'];
             //運算都要加上.toFixed(MaxFloatNum) 避免小數點不精確的問題
-            
+
             if (now_data == '' || parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + BaseNum).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
-              
+
               switch (trend) {
                 case 0:
                   if (parseFloat(v['rd_sellrate']) >= (parseFloat(now_data) + base_multiple).toFixed(MaxFloatNum) || parseFloat(v['rd_sellrate']) <= (parseFloat(now_data) - BaseNum).toFixed(MaxFloatNum)) {
@@ -364,6 +384,9 @@ $(".content").on("change", '#currency', function (event) {
 $(".content").on("change", '#date_range', function (event) {
   getRangeExchangeData();
 });
+$(".content").on("change", '#capital', function (event) {
+  getRangeExchangeData();
+});
 
 $(".content").on("change", '#cost_of_buying_rate', function (event) {
   getSingleDayExchangeData();
@@ -374,15 +397,25 @@ $(".content").on("change", '#cost_of_buying_price', function (event) {
 $(".content").on("change", '#currency_single', function (event) {
   getSingleDayExchangeData();
 });
+$(".content").on("change", '#refreshTime', function (event) {
+  $('#date_single').change();
+})
 var timer = 0;
 $(".content").on("change", '#date_single', function (event) {
+  clearInterval(timer);
   var now = new Date();
   var todate = now.getFullYear() + "-" + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1) + "-" + (now.getDate() < 10 ? '0' : '') + (now.getDate());
   var nowhour = now.getHours();
   var nowday = now.getDay();
   if (todate == $(this).val()) {
     if (nowhour >= 9 && nowhour < 23 && nowday >= 1 && nowday <= 5) {
-      timer = setInterval(getSingleDayExchangeData, 4000);
+      if ($('#refreshTime').val() != '') {
+
+        timer = setInterval(getSingleDayExchangeData, $('#refreshTime').val() * 1000);
+      } else {
+        timer = setInterval(getSingleDayExchangeData, 4000);
+      }
+
     } else {
       timer = setInterval(refresh, 600000);
     }
