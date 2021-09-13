@@ -47,7 +47,7 @@ $(function () {
       //console.log(data);
       var opt = '<option value=""></option>';
       $.each(data, function (k, v) {
-        opt += "<option value='" + v['rhl_currency'] + "'>" + v['CurrencyName'] + "</option>";
+        opt += "<option value='" + v['rhl_currency'] + "'>" + v['cd_name'] + "</option>";
       });
       $('#TradingCurrency').html(opt);
       getRate();
@@ -69,7 +69,7 @@ $(function () {
       //console.log(data);
       var opt = '<option value=""></option>';
       $.each(data, function (k, v) {
-        opt += "<option value='" + v['tr_currency'] + "'>" + v['CurrencyName'] + "</option>";
+        opt += "<option value='" + v['tr_currency'] + "'>" + v['cd_name'] + "</option>";
       });
       $('#schRecordCurrency').html(opt);
       getRate();
@@ -136,12 +136,14 @@ function getRate() {
     success: function (data)
     {
       console.log(data);
+      
       $.each(data['BoardRate'], function (k, v) {
         $('#TradingCurrency option[value=' + k + ']').data('BRate', v['BBoardRate']);
         $('#TradingCurrency option[value=' + k + ']').data('SRate', v['SBoardRate']);
       })
       $('#TradingType option[value=0]').data('Rate', data['BBoardRate']);
       $('#TradingCurrency').change();
+      
       /*$('#TradingType option[value=0]').data('Rate', data['BBoardRate']);
        $('#TradingType option[value=1]').data('Rate', data['SBoardRate']);
        if ($('#TradingType').val() != '') {
@@ -166,10 +168,11 @@ function getRecord(pageNum) {
   sch_val['date'] = date;
   $.each($('.trading_table'), function (k, v) {
     if (!$(this).hasClass('sorting')) {
-      sch_val['orderby'] = $(this).attr('id').replace("trading_table_", "");
       if ($(this).hasClass('sorting_asc')) {
+        sch_val['orderby'] = $(this).attr('id').replace("trading_table_", "");
         sch_val['Inverted'] = ' asc';
       } else if ($(this).hasClass('sorting_desc')) {
+        sch_val['orderby'] = $(this).attr('id').replace("trading_table_", "");
         sch_val['Inverted'] = ' desc';
       }
     }
@@ -229,21 +232,21 @@ function getRecord(pageNum) {
                 break;
             }
           } else if (v1 == 'tr_currency') {
-            show_data = v['CurrencyName'] + '(' + v[v1] + ')';
+            show_data = v['cd_name'] + '(' + v[v1] + ')';
           } else if (v1 == 'tr_LocalCurrencyTurnover') {
             //show_data = v[v1] + '(' + parseFloat(v['TotalLCT']).toFixed(0) + ')';
             show_data = v[v1];
           } else if (v1 == 'tr_ForeignCurrencyTurnover') {
-            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['cd_decimalplaces']) + ')';
             show_data = v[v1];
           } else if (v1 == 'TotalLCT') {
-            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['cd_decimalplaces']) + ')';
             show_data = parseFloat(v[v1]).toFixed(0);
           } else if (v1 == 'TotalFCT') {
-            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces']) + ')';
-            show_data = parseFloat(v[v1]).toFixed(v['DecimalPlaces'])*1;
+            //show_data = v[v1] + '(' + parseFloat(v['TotalFCT']).toFixed(v['cd_decimalplaces']) + ')';
+            show_data = parseFloat(v[v1]).toFixed(v['cd_decimalplaces'])*1;
           } else if (v1 == 'cost_rate') {
-            show_data = Math.abs(parseFloat(parseFloat(v['TotalLCT']).toFixed(0) / parseFloat(v['TotalFCT']).toFixed(v['DecimalPlaces'])).toFixed(v['DecimalPlaces']));
+            show_data = Math.abs(parseFloat(parseFloat(v['TotalLCT']).toFixed(0) / parseFloat(v['TotalFCT']).toFixed(v['cd_decimalplaces'])).toFixed(v['cd_decimalplaces']));
           } else {
             show_data = v[v1];
           }
@@ -368,7 +371,7 @@ function setTime() {
 }
 
 $('form').on('change', '#TradingTime', function () {
-  if ($('#TradingTime').val() != '' && $('#TradingCurrency').val() != '') {
+  if ($('#TradingTime').val() != '' ) {
     getRate();
   }
 //console.log($(this).val());
@@ -417,16 +420,16 @@ $('.schRecordForm').change(function () {
 //console.log($(this).val());
   getRecord(1);
 })
-$('.trading_table').on('click', function () {
+$('.trading_table').not('.no_sort').on('click', function () {
 //console.log($(this).attr('id'));
   if ($(this).hasClass('sorting') || $(this).hasClass('sorting_asc')) {
-    $('.trading_table').removeClass('sorting sorting_asc sorting_desc');
-    $('.trading_table').addClass('sorting');
+    $('.trading_table').not('.no_sort').removeClass('sorting sorting_asc sorting_desc');
+    $('.trading_table').not('.no_sort').addClass('sorting');
     $(this).removeClass('sorting');
     $(this).addClass('sorting_desc');
   } else {
-    $('.trading_table').removeClass('sorting sorting_asc sorting_desc');
-    $('.trading_table').addClass('sorting');
+    $('.trading_table').not('.no_sort').removeClass('sorting sorting_asc sorting_desc');
+    $('.trading_table').not('.no_sort').addClass('sorting');
     $(this).removeClass('sorting');
     $(this).addClass('sorting_asc');
   }

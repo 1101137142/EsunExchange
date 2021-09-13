@@ -17,9 +17,11 @@
 #cost_of_buying_price {
   max-width: 180px;
 }
-
+#refreshTime{
+  max-width: 120px;    
+}
 #currency_single {
-  max-width: 160px;
+  max-width: 127px;
 }
 #date_single {
   max-width: 100px;
@@ -28,14 +30,14 @@
   max-width: 100px;
 }
 #capital{
-  max-width: 90px;
+  max-width: 120px;
 
 }
 #currency{
-  max-width: 140px;
+  max-width: 120px;
 
 }
 #date_range{
-  max-width: 200px;
+  max-width: 190px;
 
 }

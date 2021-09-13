@@ -3,7 +3,7 @@
 class TradingRecordAction implements actionPerformed {
 
   public function actionPerformed($event) {
-
+    require_once 'Model/ExchangeModel.php';
     $ExchangeModel = new ExchangeModel();
 
     $doTradingRecordAction = $_POST["doTradingRecordAction"];
@@ -58,10 +58,16 @@ class TradingRecordAction implements actionPerformed {
         $returnData = $ExchangeModel->insExchangeTradingRecord($TradingType, $TradingTime, $TradingCurrency, $TradingRate, $LocalCurrencyTurnover, $ForeignCurrencyTurnover);
 
         break;
+
+      case 'getExchangeCurrentStatistics'://取得外匯交易總計
+        $orderby = $_POST['data']['orderby']; //主要排序欄位
+        $Inverted = $_POST['data']['Inverted']; //順排或倒排
+        //取得要回傳的資料
+        $returnData = $ExchangeModel->getExchangeCurrentStatistics($orderby,$Inverted);
+        //$returnData =$schRecordCurrency;
+        break;
     }
     echo json_encode($returnData, true);
   }
 
 }
-
-?>

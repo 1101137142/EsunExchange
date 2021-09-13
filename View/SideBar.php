@@ -1,16 +1,14 @@
-
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="index.php" class="brand-link">
-    <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-         style="opacity: .8">
+    <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text font-weight-light">MSD</span>
   </a>
 
   <!-- Sidebar -->
   <div class="sidebar">
-    
+
     <!-- Sidebar user panel (optional) -->
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
       <div class="image">
@@ -43,18 +41,79 @@
             </li>
             <li class="nav-item">
               <a href="?Content=TradingRecord" class="nav-link SideBar_TradingRecord">
-                <i class="fas fa-chart-line nav-icon"></i>
+
+                <i class="fas fa-book nav-icon"></i>
                 <p>Trading Record</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Dashboard v3</p>
+              <a href="?Content=CurrentStatistics" class="nav-link SideBar_CurrentStatistics">
+                <i class="fas fa-align-left nav-icon"></i>
+                <p>Current Statistics</p>
               </a>
             </li>
           </ul>
         </li>
+
+        <li class="nav-item has-treeview ">
+          <a href="#" class="nav-link ">
+            <i class="nav-icon fas fa-clipboard-list"></i>
+            <p>
+              Mission System Single
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="?Content=MissionOverview" class="nav-link SideBar_MissionOverview">
+                <i class="fas fa-clipboard-list nav-icon"></i>
+                <p>Mission Overview</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="?Content=MissionList" class="nav-link SideBar_MissionList">
+                <i class="fas fa-tasks nav-icon"></i>
+                <p>Mission List</p>
+              </a>
+            </li>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link ">
+                <i class="fas fa-cog nav-icon"></i>
+                <p>Mission Setting
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="?Content=ShortTermGoal" class="nav-link SideBar_ShortTermGoal">
+                    <i class="fas fa-genderless nav-icon"></i>
+                    <p>Short-term Goal</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="?Content=MidTermGoal" class="nav-link SideBar_MidTermGoal">
+                    <i class="far fa-dot-circle nav-icon"></i>
+                    <p>Mid-term goals</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="?Content=LongTermGoal" class="nav-link SideBar_LongTermGoal">
+                    <i class="fas fa-bullseye nav-icon"></i>
+                    <p>Long-term goals</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="?Content=MissionRelations" class="nav-link SideBar_MissionRelations">
+                    <!--i class="fab fa-hubspot nav-icon"></i-->
+                    <i class="fas fa-share-alt nav-icon"></i>
+                    <p>Mission Relations</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
         <li class="nav-item has-treeview .menu-open">
           <a href="#" class="nav-link .active">
             <i class="nav-icon fas fa-tachometer-alt"></i>

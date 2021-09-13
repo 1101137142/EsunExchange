@@ -3,7 +3,8 @@
 class ExchangeDataAction implements actionPerformed {
 
   public function actionPerformed($event) {
-
+    
+    require_once 'Model/ExchangeModel.php';
     $ExchangeModel = new ExchangeModel();
 
     $doExchangeAction = $_POST["doExchangeAction"];

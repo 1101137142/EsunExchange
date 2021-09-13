@@ -51,7 +51,9 @@
 if (@$_GET["Content"]) {
   $src = "View/js/" . $_GET["Content"] . ".js";
   $Content = $_GET["Content"];
-  echo "<script>$('.SideBar_" . $Content . "').addClass('active');$('.SideBar_" . $Content . "').parent().parent().parent().addClass('menu-open');$('.SideBar_" . $Content . "').parent().parent().parent().children('a').addClass('active');</script>";
+  //echo "<script>$('.SideBar_" . $Content . "').addClass('active');$('.SideBar_" . $Content . "').parent().parent().parent().addClass('menu-open');$('.SideBar_" . $Content . "').parent().parent().parent().children('a').addClass('active');</script>";
+  echo "<script>$('.SideBar_" . $Content . "').addClass('active');$('.SideBar_" . $Content . "').closest('.has-treeview').addClass('menu-open');$('.SideBar_" . $Content . "').closest('.has-treeview').children('a').addClass('active');$('.SideBar_" . $Content . "').closest('.has-treeview').parent().closest('.has-treeview').addClass('menu-open');
+  $('.SideBar_" . $Content . "').closest('.has-treeview').parent().closest('.has-treeview').children('a').addClass('active');</script>";
 } else {
   $src = "dist/js/pages/dashboard.js";
 }

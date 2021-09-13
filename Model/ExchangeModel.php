@@ -3,7 +3,7 @@
 class ExchangeModel extends Model {
 
   function getExchangeDataByDate($currency, $date) {
-    $sql = "SELECT DISTINCT * FROM (SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%' UNION ALL SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_tmpdetail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%') tmp left join currencydata on tmp.rd_currency=currencydata.CurrencyCode order by rd_datetime ";
+    $sql = "SELECT DISTINCT * FROM (SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_detail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%' UNION ALL SELECT *,HOUR(rd_datetime) H,MINUTE(rd_datetime) M,SECOND(rd_datetime) S FROM `rates_tmpdetail` WHERE `rd_currency` = :rd_currency and `rd_datetime` like '" . $date . "%') tmp left join currency_data on tmp.rd_currency=currency_data.cd_code order by rd_datetime ";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute(array(':rd_currency' => $currency));
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -11,7 +11,7 @@ class ExchangeModel extends Model {
   }
 
   function getExchangeDataByRnage($currency, $date_start, $date_end) {
-    $sql = "SELECT * FROM `rates_hl` left join currencydata on rhl_currency=CurrencyCode WHERE `rhl_currency` = :rhl_currency and `rhl_date` between '" . $date_start . "' and '" . $date_end . "'";
+    $sql = "SELECT * FROM `rates_hl` left join currency_data on rhl_currency=cd_code WHERE `rhl_currency` = :rhl_currency and `rhl_date` between '" . $date_start . "' and '" . $date_end . "'";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute(array(':rhl_currency' => $currency));
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -19,7 +19,7 @@ class ExchangeModel extends Model {
   }
 
   function getExchangeCurrency() {
-    $sql = "SELECT DISTINCT rhl_currency,CurrencyName FROM `rates_hl` left join currencydata on rhl_currency=CurrencyCode ";
+    $sql = "SELECT DISTINCT rhl_currency,cd_name FROM `rates_hl` left join currency_data on rhl_currency=cd_code ";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -27,7 +27,7 @@ class ExchangeModel extends Model {
   }
 
   function getTradingRecordCurrency() {
-    $sql = "SELECT DISTINCT tr_currency,CurrencyName FROM `trading_record` left join currencydata on tr_currency=CurrencyCode ";
+    $sql = "SELECT DISTINCT tr_currency,cd_name FROM `trading_record` left join currency_data on tr_currency=cd_code ";
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -84,9 +84,11 @@ class ExchangeModel extends Model {
 
       $BoardRate[$val["Key"]]['BBoardRate'] = $val['BuyIncreaseRate'];
       $BoardRate[$val["Key"]]['SBoardRate'] = $val['SellDecreaseRate'];
+      $BoardRate[$val["Key"]]['UpdateTime'] = $val['UpdateTime'];      
       //$SBoardRate[$val["Key"]] = $val['SBoardRate'];
     }
     $row = array('TradingTime' => $date->format('Y-m-d H:i:s'), 'BoardRate' => $BoardRate);
+    
     return $row;
   }
 
@@ -98,7 +100,7 @@ class ExchangeModel extends Model {
     //$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $status;
   }
-
+  //取得外幣交易紀錄
   function getExchangeTradingRecord($schRecordCurrency, $date, $orderby, $Inverted, $pageNum) {
     $sqlWhere = ' 1=1 ';
     if ($schRecordCurrency != 'ALL') {
@@ -115,7 +117,7 @@ class ExchangeModel extends Model {
     }
     //$status = $sqlWhere;
     $firstData = ($pageNum - 1) * 10;
-    $sqlCount = "SELECT * FROM `trading_record` left join currencydata on tr_currency=CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby,tr_rid ";
+    $sqlCount = "SELECT * FROM `trading_record` left join currency_data on tr_currency=cd_code WHERE " . $sqlWhere . " ORDER BY $orderby,tr_rid ";
     $stmtCount = $this->cont->prepare($sqlCount);
     $status[] = $stmtCount->execute();
     $rowcount = $stmtCount->rowCount();
@@ -123,7 +125,7 @@ class ExchangeModel extends Model {
     $sql = "SELECT * ";
     $sql .= ",(SELECT sum(temp.tr_LocalCurrencyTurnover) FROM trading_record temp WHERE (temp.tr_tradingtime<T0.tr_tradingtime or(temp.tr_tradingtime=T0.tr_tradingtime and temp.tr_rid<T0.tr_rid)or(temp.tr_rid=T0.tr_rid)) and temp.tr_currency=T0.tr_currency ) TotalLCT";
     $sql .= ",(SELECT sum(temp.tr_ForeignCurrencyTurnover) FROM trading_record temp WHERE (temp.tr_tradingtime<T0.tr_tradingtime or(temp.tr_tradingtime=T0.tr_tradingtime and temp.tr_rid<T0.tr_rid)or(temp.tr_rid=T0.tr_rid)) and temp.tr_currency=T0.tr_currency ) TotalFCT";
-    $sql .= " FROM `trading_record` T0 left join currencydata T1 on T0.tr_currency=T1.CurrencyCode WHERE " . $sqlWhere . " ORDER BY $orderby $Inverted,tr_rid $Inverted limit $firstData,10";
+    $sql .= " FROM `trading_record` T0 left join currency_data T1 on T0.tr_currency=T1.cd_code WHERE " . $sqlWhere . " ORDER BY $orderby $Inverted,tr_rid $Inverted limit $firstData,10";
     //$row = $sql;
     $stmt = $this->cont->prepare($sql);
     $status[] = $stmt->execute();
@@ -133,6 +135,22 @@ class ExchangeModel extends Model {
     return $data;
   }
 
-}
+  //取得外幣金額總計
+  function getExchangeCurrentStatistics($orderby, $Inverted) {
+    $sqlWhere = ' 1=1 ';
 
-?>
+    /*$sql = "SELECT * ";
+    $sql .= ",(SELECT sum(temp.tr_LocalCurrencyTurnover) FROM trading_record temp WHERE temp.tr_currency=T0.cd_code ) TotalLCT";
+    $sql .= ",(SELECT sum(temp.tr_ForeignCurrencyTurnover) FROM trading_record temp WHERE temp.tr_currency=T0.cd_code ) TotalFCT";
+    $sql .= " FROM `currency_data` T0 WHERE " . $sqlWhere . " HAVING TotalLCT IS NOT NULL or TotalFCT IS NOT NULL ORDER BY $orderby $Inverted";
+    */
+    $sql="SELECT * FROM `current_statistics` WHERE TotalLCT IS NOT NULL or TotalFCT IS NOT NULL ORDER BY $orderby $Inverted ";
+    //$row = $sql;
+    $stmt = $this->cont->prepare($sql);    
+    $status[] = $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data['row'] = $row;
+    return $data;
+  }
+
+}

@@ -3,12 +3,12 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <h1>Trading Record Ins Form</h1>
+        <h1>Trading Form</h1>
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
-          <li class="breadcrumb-item active">Trading Record Ins Form</li>
+          <li class="breadcrumb-item active">Trading Form</li>
         </ol>
       </div>
     </div>
@@ -23,7 +23,7 @@
         <!-- 交易表單-S -->
         <div class="card card-primary">
           <div class="card-header">
-            <h3 class="card-title">Trading Form</h3>
+            <h3 class="card-title">Trading Record Ins Form</h3>
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
               <!--button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button-->
@@ -110,7 +110,7 @@
           </div>
         </div>
         <!-- 交易表單-E -->
-        <div class="card">
+        <div class="card  card-info">
           <div class="card-header">
             <h3 class="card-title">外幣交易紀錄</h3>
           </div>
@@ -118,7 +118,6 @@
           <div class="card-body">
             <div class="row">
               <div class="col-lg-6 col-md-3  col-sm-1 col-1">
-                <label id="today_gap"></label>
               </div>
               <!--div class="col-lg-3 offset-lg-9 col-md-5 offset-md-7 col-sm-7 offset-sm-5 col-9"-->
               <div class="col-lg-6 col-md-9 col-sm-11 col-11">
@@ -142,10 +141,10 @@
                         <th id="trading_table_tr_LocalCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >本幣金額</th>
                         <th id="trading_table_tr_ForeignCurrencyTurnover" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >外幣金額</th>
                         <th id="trading_table_tr_rate" class="trading_table sorting" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >匯率</th>
-                        <th id="trading_table_TotalLCT" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總投入金額</th>
-                        <th id="trading_table_TotalFCT" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總外幣金額</th>
-                        <th id="trading_table_cost_rate" class="trading_table " tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >成本</th>
-                        <th id="trading_table_tr_tradingtime" class="trading_table  sorting_asc" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >交易時間</th>
+                        <th id="trading_table_TotalLCT" class="trading_table no_sort" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總投入金額</th>
+                        <th id="trading_table_TotalFCT" class="trading_table no_sort" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >總外幣金額</th>
+                        <th id="trading_table_cost_rate" class="trading_table no_sort" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >成本</th>
+                        <th id="trading_table_tr_tradingtime" class="trading_table  sorting_desc" tabindex="0" aria-controls="trading_table" rowspan="1" colspan="1" >交易時間</th>
                       </tr>
                     </thead>
                     <tbody id="trading_table_body">
